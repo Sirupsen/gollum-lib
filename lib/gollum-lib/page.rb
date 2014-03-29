@@ -324,6 +324,10 @@ module Gollum
     #
     #########################################################################
 
+    CHAR_WHITE_SUB = " ".freeze
+    CHAR_OTHER_SUB = "<>+".freeze
+    CHAR_BOTH_SUB = "#{CHAR_WHITE_SUB}#{CHAR_OTHER_SUB}".freeze
+
     # Convert a human page name into a canonical page name.
     #
     # name           - The String human page name.
@@ -339,10 +343,18 @@ module Gollum
     #   # => 'Bilbo_Baggins'
     #
     # Returns the String canonical name.
-    def self.cname(name, char_white_sub = '-', char_other_sub = '-')
-      name.respond_to?(:gsub) ?
-        name.gsub(%r{\s},char_white_sub).gsub(%r{[<>+]}, char_other_sub) :
-        ''
+    def self.cname(name, char_white_sub = '-'.freeze, char_other_sub = '-'.freeze)
+      if name.respond_to?(:gsub)
+        if char_white_sub == char_other_sub
+          name.tr(CHAR_BOTH_SUB.freeze, char_white_sub)
+        else
+          name = name.tr(CHAR_WHITE_SUB.freeze, char_white_sub)
+          name.tr!(CHAR_OTHER_SUB.freeze, char_other_sub)
+          name
+        end
+      else
+        ''.freeze
+      end
     end
 
     # Convert a format Symbol into an extension String.

@@ -47,6 +47,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rb-inotify', '~> 0.9.0')
   s.add_development_dependency('rb-fsevent', '~> 0.9.3')
   s.add_development_dependency('rb-fchange', '~> 0.0.6')
+  s.add_development_dependency('benchmark-ips', '~> 1.2')
 
   # = MANIFEST =
   s.files = %w[
