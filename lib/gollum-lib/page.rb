@@ -88,6 +88,7 @@ module Gollum
       @blob = @header = @footer = @sidebar = nil
       @doc = nil
       @parent_page = nil
+      @sub_pages = Hash.new({})
     end
 
     # Public: The on-disk filename of the page including extension.
@@ -216,9 +217,10 @@ module Gollum
     #
     # Returns the String data.
     def formatted_data(encoding = nil, include_levels = 10, &block)
-      @blob && markup_class.render(historical?, encoding, include_levels) do |doc|
-        @doc = doc
-        yield doc if block_given?
+      if @blob
+        @doc ||= markup_class.render(historical?, encoding, include_levels)
+        return yield(@doc) if block_given?
+        @doc
       end
     end
 
@@ -478,6 +480,7 @@ module Gollum
       return nil if self.filename =~ /^_/
       name = "_#{name.to_s.capitalize}"
       return nil if page_match(name, self.filename)
+      return @sub_pages[self.path][name] if @sub_pages[self.path].has_key?(name) 
 
       dirs = self.path.split('/')
       dirs.pop
@@ -485,7 +488,7 @@ module Gollum
       while !dirs.empty?
         if page = find_page_in_tree(map, name, dirs.join('/'))
           page.parent_page = self
-          return page
+          return @sub_pages[self.path][name] = page
         end
         dirs.pop
       end
@@ -493,7 +496,7 @@ module Gollum
       if page = find_page_in_tree(map, name, '')
         page.parent_page = self
       end
-      page
+      @sub_pages[self.path][name] = page
     end
 
     def inspect

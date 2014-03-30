@@ -236,6 +236,7 @@ module Gollum
       @per_page_uploads     = options.fetch :per_page_uploads, false
       @filter_chain         = options.fetch :filter_chain,
                               [:Metadata, :PlainText, :TOC, :RemoteCode, :Code, :Sanitize, :WSD, :Tags, :Render]
+      @pages                = {}
     end
 
     # Public: check whether the wiki's git repo exists on the filesystem.
@@ -254,7 +255,11 @@ module Gollum
     # Returns a Gollum::Page or nil if no matching page was found.
     def page(name, version = @ref, dir = nil, exact = false)
       version = @ref if version.nil?
-      @page_class.new(self).find(name, version, dir, exact)
+      if @pages[name] && @pages[name].wiki.ref == self.ref
+        @pages[name]
+      else
+        @pages[name] = @page_class.new(self).find(name, version, dir, exact)
+      end
     end
 
     # Public: Convenience method instead of calling page(name, nil, dir).
