@@ -255,10 +255,12 @@ module Gollum
     # Returns a Gollum::Page or nil if no matching page was found.
     def page(name, version = @ref, dir = nil, exact = false)
       version = @ref if version.nil?
-      if @pages[name] && @pages[name].wiki.ref == self.ref
-        @pages[name]
+      path = "#{dir}/#{name}"
+
+      if @pages[path] && @pages[path].wiki.ref == self.ref
+        @pages[path]
       else
-        @pages[name] = @page_class.new(self).find(name, version, dir, exact)
+        @pages[path] = @page_class.new(self).find(name, version, dir, exact)
       end
     end
 
